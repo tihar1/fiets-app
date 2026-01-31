@@ -1,81 +1,71 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="nl">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2487.2">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideFuel - Calorie Calculator</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
+        h2 { color: #e67e22; margin-top: 0; text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: #e67e22; }
+        button { width: 100%; background: #e67e22; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 10px; cursor: pointer; transition: background 0.3s; }
+        button:active { background: #d35400; transform: scale(0.98); }
+        .result-area { margin-top: 25px; padding: 20px; background: #fff3e0; border-radius: 12px; display: none; border-left: 5px solid #e67e22; }
+        .kcal-val { font-size: 24px; font-weight: bold; color: #d35400; }
+        .suggestion { margin-top: 10px; line-height: 1.5; color: #444; }
+        hr { margin: 30px 0; border: 0; border-top: 1px solid #eee; }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="nl"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;RideFuel Tracker&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body { font-family: -apple-system, sans-serif; background: #f4f4f9; padding: 20px; color: #333; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>h2 { color: #ff5722; margin-top: 0; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>label { display: block; margin: 10px 0 5px; font-weight: bold; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>button { width: 100%; background: #ff5722; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; margin-top: 20px; cursor: pointer; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.result { margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; display: none; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.meal-box { font-style: italic; color: #2e7d32; margin-top: 10px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div class="card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;h2&gt;🚴‍♂️ RideFuel&lt;/h2&gt;</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;label&gt;Wattage (Gemiddeld)&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="number" id="wattage" placeholder="Bijv. 200"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;label&gt;Tijd (minuten)&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="number" id="tijd" placeholder="Bijv. 60"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;button onclick="bereken()"&gt;Bereken Verbruik &amp; Maaltijd&lt;/button&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="resultaat" class="result"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;strong&gt;Verbrand: &lt;span id="kcal"&gt;0&lt;/span&gt; kcal&lt;/strong&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="suggestie" class="meal-box"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p1">function bereken() {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const watt = document.getElementById('wattage').value;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const min = document.getElementById('tijd').value;</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(watt &gt; 0 &amp;&amp; min &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Formule: Watt * (tijd in uren) * 3.6</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const kcal = Math.round(watt * (min / 60) * 3.6);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('kcal').innerText = kcal;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>let suggestie = "";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if(kcal &lt; 400) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>suggestie = "Suggestie: Een banaan of een bakje magere kwark. Licht herstel nodig.";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>} else if(kcal &lt; 800) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>suggestie = "Suggestie: Bord havermout met fruit of twee volkoren boterhammen met kipfilet.";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>suggestie = "Suggestie: Grote maaltijd! Pasta met veel groenten en eiwitten (kip/tofu) + extra hydratatie.";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('suggestie').innerText = suggestie;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('resultaat').style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>alert("Vul aub geldige getallen in.");</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1">}</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<div class="card">
+    <h2>🚴‍♂️ RideFuel Tracker</h2>
+    
+    <div id="setup">
+        <div class="input-group">
+            <label>Gepland Wattage</label>
+            <input type="number" id="watt" placeholder="Bijv. 200">
+        </div>
+        <div class="input-group">
+            <label>Tijd (minuten)</label>
+            <input type="number" id="tijd" placeholder="Bijv. 60">
+        </div>
+        <button onclick="bereken()">Bereken Maaltijd</button>
+    </div>
+
+    <div id="resultaat" class="result-area">
+        <div>Je verbruik: <span class="kcal-val" id="kcalDisplay">0</span> kcal</div>
+        <div class="suggestion" id="suggestieText"></div>
+        
+        <hr>
+        <p style="font-size: 12px; color: #888;"><strong>Achteraf hercalculeren?</strong> Pas hierboven de waarden aan naar je Garmin/Strava data en druk opnieuw op de knop.</p>
+    </div>
+</div>
+
+<script>
+function bereken() {
+    const w = document.getElementById('watt').value;
+    const t = document.getElementById('tijd').value;
+    
+    if(w > 0 && t > 0) {
+        const kcal = Math.round(w * (t / 60) * 3.6);
+        document.getElementById('kcalDisplay').innerText = kcal;
+        
+        let msg = "";
+        if(kcal < 400) msg = "🎯 <b>Herstel:</b> Neem een kleine snack zoals een banaan of 150g magere kwark.";
+        else if(kcal < 800) msg = "🎯 <b>Maaltijd:</b> Een kom havermout of twee volkoren boterhammen met beleg.";
+        else msg = "🎯 <b>Grote Maaltijd:</b> Focus op koolhydraten (pasta/rijst) en 20-30g eiwit voor spierherstel.";
+        
+        document.getElementById('suggestieText').innerHTML = msg;
+        document.getElementById('resultaat').style.display = 'block';
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+}
+</script>
+
 </body>
 </html>
