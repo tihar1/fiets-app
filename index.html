@@ -3,73 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RideFuel Pro v2</title>
+    <title>RideFuel Recipe Pro</title>
     <style>
-        :root { --primary: #e67e22; --secondary: #2980b9; --bg: #f4f7f9; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 15px; color: #333; }
+        :root { --primary: #e67e22; --bg: #f4f7f9; --accent: #2ecc71; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 10px; color: #333; font-size: 14px; }
         .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
-        h2 { color: var(--primary); text-align: center; margin-bottom: 20px; }
+        h2 { color: var(--primary); text-align: center; margin-bottom: 15px; }
+        .setup-box { background: #fff3e0; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ffe0b2; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+        input, select { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; background: white; }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
         
-        /* Highlight de nieuwe keuze-box */
-        .moment-box { background: #fff3e0; padding: 15px; border-radius: 12px; border: 2px solid var(--primary); margin-bottom: 20px; }
+        .meal-item { background: white; border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 12px; }
+        .meal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
+        .meal-title { font-weight: bold; font-size: 16px; color: #444; }
+        .meal-kcal { color: var(--primary); font-weight: bold; }
         
-        .input-box { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; background: white; }
-        button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        .summary { background: #e3f2fd; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; border: 1px solid #bbdefb; }
-        .total-kcal { font-size: 26px; font-weight: bold; color: #1976d2; }
-
-        .meal-list { margin-top: 20px; }
-        .meal-item { background: white; border-left: 5px solid #ccc; padding: 15px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .meal-item.pre { border-left-color: #f1c40f; background: #fffdf0; } /* Geel voor Brandstof */
-        .meal-item.post { border-left-color: #2ecc71; background: #f0fff4; } /* Groen voor Herstel */
-        .meal-title { font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-        .meal-kcal { color: var(--primary); font-size: 18px; }
-        .meal-desc { font-size: 14px; color: #555; margin-top: 8px; line-height: 1.4; }
-        .tag { font-size: 10px; text-transform: uppercase; background: #eee; padding: 2px 6px; border-radius: 4px; margin-left: 5px; font-weight: bold; }
+        .ingredient-list { background: #f9f9f9; padding: 10px; border-radius: 8px; }
+        .ingredient-line { display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed #ddd; padding-bottom: 2px; }
+        .tag { font-size: 10px; text-transform: uppercase; background: #eee; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .total-banner { background: #34495e; color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🚴‍♂️ RideFuel Pro</h2>
+    <h2>🚴‍♂️ RideFuel Recipe Pro</h2>
     
-    <div class="moment-box">
+    <div class="setup-box">
         <label>🕒 Wanneer ga je fietsen?</label>
         <select id="moment">
             <option value="ochtend">In de ochtend (na ontbijt)</option>
             <option value="middag">In de middag (na lunch)</option>
             <option value="avond">In de avond (na diner)</option>
         </select>
-    </div>
 
-    <div class="input-box">
-        <label>Gepland Vermogen (Watt)</label>
-        <input type="number" id="watt" placeholder="Bijv. 200">
-    </div>
+        <label>⚡ Gepland Vermogen (Watt)</label>
+        <input type="number" id="watt" value="200">
 
-    <div class="input-box">
-        <label>Duur (minuten)</label>
-        <input type="number" id="tijd" placeholder="Bijv. 90">
-    </div>
+        <label>⏱️ Duur (minuten)</label>
+        <input type="number" id="tijd" value="90">
 
-    <button onclick="generatePlan()">Genereer Dagplanning</button>
+        <button onclick="calculateEverything()">Bereken Hoeveelheden</button>
+    </div>
 
     <div id="results" style="display:none;">
-        <div class="summary">
-            <div>Totaal budget voor vandaag:</div>
-            <div class="total-kcal"><span id="totalDisplay">0</span> kcal</div>
-            <div style="font-size: 12px; color: #666;">(1800 BMR + sport-verbruik)</div>
+        <div class="total-banner">
+            <div style="font-size: 12px; opacity: 0.8;">Totaal Dagbudget</div>
+            <div style="font-size: 24px; font-weight: bold;"><span id="totalDisplay">0</span> kcal</div>
         </div>
 
-        <div class="meal-list" id="mealList"></div>
+        <div id="mealContainer"></div>
     </div>
 </div>
 
 <script>
-function generatePlan() {
+// "Database" met ingrediënten (kcal per 100g of per stuk)
+const data = {
+    havermout: 370,
+    melk: 50,
+    pindakaas: 600,
+    kokosrasp: 650,
+    banaan: 90, // per stuk
+    brood: 250,
+    kaas: 400,
+    kip: 110,
+    rijst: 350,
+    pasta: 350,
+    groenten: 30,
+    kwark: 60,
+    noten: 650
+};
+
+function calculateEverything() {
     const bmr = 1800;
     const watt = parseFloat(document.getElementById('watt').value) || 0;
     const min = parseFloat(document.getElementById('tijd').value) || 0;
@@ -81,46 +87,74 @@ function generatePlan() {
     document.getElementById('totalDisplay').innerText = totalKcal;
     document.getElementById('results').style.display = 'block';
 
-    const meals = [
-        { id: 'ontbijt', name: "🍳 Ontbijt", basePct: 0.20, type: 'normal' },
-        { id: 'osnack', name: "🍎 Ochtendsnack", basePct: 0.08, type: 'normal' },
-        { id: 'lunch', name: "🥪 Lunch", basePct: 0.25, type: 'normal' },
-        { id: 'msnack', name: "🍌 Middagsnack", basePct: 0.08, type: 'normal' },
-        { id: 'diner', name: "🍝 Diner", basePct: 0.30, type: 'normal' },
-        { id: 'asnack', name: "🍫 Avondsnack", basePct: 0.09, type: 'normal' }
+    const mealConfig = [
+        { name: "🍳 Ontbijt", pct: 0.20, recipe: 'havermout_mix' },
+        { name: "🍎 Ochtendsnack", pct: 0.08, recipe: 'lichte_snack' },
+        { name: "🥪 Lunch", pct: 0.25, recipe: 'brood_maaltijd' },
+        { name: "🍌 Middagsnack", pct: 0.08, recipe: 'lichte_snack' },
+        { name: "🍝 Diner", pct: 0.30, recipe: 'warme_maaltijd' },
+        { name: "🍫 Avondsnack", pct: 0.09, recipe: 'herstel_snack' }
     ];
 
-    // Bepaal welke maaltijden 'Pre' en 'Post' zijn
-    if (moment === 'ochtend') { meals[0].type = 'pre'; meals[1].type = 'post'; }
-    else if (moment === 'middag') { meals[2].type = 'pre'; meals[3].type = 'post'; }
-    else if (moment === 'avond') { meals[4].type = 'pre'; meals[5].type = 'post'; }
-
-    const container = document.getElementById('mealList');
+    const container = document.getElementById('mealContainer');
     container.innerHTML = "";
 
-    meals.forEach(m => {
-        let kcal = Math.round(totalKcal * m.basePct);
-        let suggestie = "";
-        let className = "meal-item " + m.type;
-        let tag = m.type === 'pre' ? '<span class="tag" style="background:#f1c40f">Brandstof</span>' : (m.type === 'post' ? '<span class="tag" style="background:#2ecc71; color:white;">Herstel</span>' : '');
+    mealConfig.forEach((m, idx) => {
+        let kcalTarget = Math.round(totalKcal * m.pct);
+        let ingredients = [];
 
-        if (m.type === 'pre') {
-            suggestie = `<b>Brandstof:</b> ${Math.round(kcal/4)}g havermout of pannenkoeken met stroop. Weinig vetten, focus op snelle energie.`;
-        } else if (m.type === 'post') {
-            suggestie = `<b>Herstel:</b> ${Math.round(kcal/6)}g kwark of een omelet met 2 sneden brood. Voeg wat fruit toe voor suikers.`;
+        // Specifieke recept-logica
+        if (m.recipe === 'havermout_mix') {
+            // Jouw specifieke vraag: Haver, kokos, pindakaas, melk, banaan
+            let overig = kcalTarget - data.banaan; // 1 banaan eraf
+            let pk = 15; // 15g pindakaas
+            let kr = 10; // 10g kokos
+            overig -= (pk * (data.pindakaas/100)) + (kr * (data.kokosrasp/100));
+            
+            // De rest verdelen we over melk (70%) en havermout (30%) in kcal
+            let gramHaver = Math.round((overig * 0.6) / (data.havermout/100));
+            let gramMelk = Math.round((overig * 0.4) / (data.melk/100));
+
+            ingredients = [
+                { n: "Havermout", g: gramHaver + "g" },
+                { n: "Halfvolle melk", g: gramMelk + "ml" },
+                { n: "Banaan", g: "1 stuk" },
+                { n: "Pindakaas", g: pk + "g" },
+                { n: "Kokosrasp", g: kr + "g" }
+            ];
+        } else if (m.recipe === 'brood_maaltijd') {
+            let sneden = Math.round((kcalTarget * 0.6) / (data.brood / 100 / 35)); // 35g per snee
+            ingredients = [
+                { n: "Volkoren brood", g: sneden + " sneden" },
+                { n: "Beleg (kaas/kip)", g: "Naar behoefte" },
+                { n: "Appel", g: "1 stuk" }
+            ];
+        } else if (m.recipe === 'warme_maaltijd') {
+            let gramRijst = Math.round((kcalTarget * 0.5) / (data.rijst / 100));
+            ingredients = [
+                { n: "Rijst of Pasta (ongekookt)", g: gramRijst + "g" },
+                { n: "Eiwitbron (kip/tofu)", g: "150g" },
+                { n: "Groenten", g: "250g" }
+            ];
         } else {
-            if (m.name.includes("Diner")) suggestie = `<b>Basis:</b> ${Math.round(kcal/7)}g pasta/rijst (ongekookt gewogen) met mager vlees of vervanger en veel groenten.`;
-            else if (m.name.includes("Lunch")) suggestie = `<b>Basis:</b> 3 volkoren boterhammen met gezond beleg (kaas/hummus/kip).`;
-            else suggestie = `<b>Snack:</b> Een handje noten of een eiwitrijke reep.`;
+            ingredients = [{ n: "Focus op", g: kcalTarget + " kcal aan gezonde voeding" }];
         }
 
+        // HTML bouwen voor maaltijd
+        let ingHTML = ingredients.map(i => `
+            <div class="ingredient-line">
+                <span>${i.n}</span>
+                <strong>${i.g}</strong>
+            </div>
+        `).join('');
+
         container.innerHTML += `
-            <div class="${className}">
-                <div class="meal-title">
-                    <span>${m.name} ${tag}</span>
-                    <span class="meal-kcal">${kcal} kcal</span>
+            <div class="meal-item">
+                <div class="meal-header">
+                    <span class="meal-title">${m.name}</span>
+                    <span class="meal-kcal">${kcalTarget} kcal</span>
                 </div>
-                <div class="meal-desc">${suggestie}</div>
+                <div class="ingredient-list">${ingHTML}</div>
             </div>
         `;
     });
