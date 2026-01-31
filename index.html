@@ -83,4 +83,31 @@ function updatePlanning() {
 
     // Maaltijdverdeling (%)
     const meals = [
-        { name
+        { name: "🍳 Ontbijt", pct: 0.20, desc: "Focus op trage koolhydraten (havermout)." },
+        { name: "🍎 Ochtendsnack", pct: 0.08, desc: "Fruit of een kleine eiwitreep." },
+        { name: "🥪 Lunch", pct: 0.25, desc: "Rijk aan vezels en eiwitten." },
+        { name: "🍌 Middagsnack", pct: 0.08, desc: "Ideaal moment voor wat extra energie." },
+        { name: "🍝 Diner", pct: 0.30, desc: "Grootste maaltijd, herstel focus." },
+        { name: "🍫 Avondsnack", pct: 0.09, desc: "Kwark of lichte snack voor de nacht." }
+    ];
+
+    const mealList = document.getElementById('mealList');
+    mealList.innerHTML = "";
+    
+    meals.forEach(m => {
+        const mKcal = Math.round(totalKcal * m.pct);
+        mealList.innerHTML += `
+            <div class="meal-item">
+                <div class="meal-title">
+                    <span>${m.name}</span>
+                    <span class="meal-kcal">${mKcal} kcal</span>
+                </div>
+                <div class="meal-desc">${m.desc}</div>
+            </div>
+        `;
+    });
+}
+</script>
+
+</body>
+</html>
