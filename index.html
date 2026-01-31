@@ -3,27 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RideFuel - Jouw Voedingsplan</title>
+    <title>RideFuel Pro</title>
     <style>
-        :root { --primary: #e67e22; --bg: #f0f2f5; --card-bg: #ffffff; }
+        :root { --primary: #e67e22; --bg: #f0f2f5; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 10px; color: #333; }
-        .card { background: var(--card-bg); padding: 20px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
-        h2 { color: var(--primary); text-align: center; margin-bottom: 20px; font-weight: 800; }
-        
-        .section { background: #fdfdfd; border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+        h2 { color: var(--primary); text-align: center; margin-bottom: 20px; }
+        .setup { background: #fff3e0; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ffe0b2; }
         label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #666; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
-        
-        button { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:active { transform: scale(0.98); }
-
-        .total-display { text-align: center; padding: 15px; background: #34495e; color: white; border-radius: 15px; margin-bottom: 20px; }
-        .total-kcal { font-size: 28px; font-weight: bold; display: block; }
-
+        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; background: white; -webkit-appearance: none; }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .total-display { text-align: center; padding: 15px; background: #34495e; color: white; border-radius: 15px; margin: 20px 0; }
         .meal { border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .meal-title { font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .recipe { font-size: 14px; line-height: 1.6; color: #444; }
+        .meal-title { font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 8px; }
         .qty { font-weight: bold; color: #d35400; }
+        .recipe { font-size: 14px; line-height: 1.5; color: #444; }
     </style>
 </head>
 <body>
@@ -31,7 +25,7 @@
 <div class="card">
     <h2>🚴‍♂️ RideFuel Pro</h2>
 
-    <div class="section">
+    <div class="setup">
         <label>🕒 Wanneer fiets je?</label>
         <select id="moment">
             <option value="ochtend">Ochtend (na ontbijt)</option>
@@ -39,48 +33,75 @@
             <option value="avond">Avond (na diner)</option>
         </select>
 
-        <label>⚡ Gemiddeld Wattage</label>
+        <label>⚡ Wattage (Gemiddeld)</label>
         <input type="number" id="watt" value="200">
 
         <label>⏱️ Duur (minuten)</label>
-        <input type="number" id="tijd" value="90">
+        <input type="number" id="tijd" value="60">
 
-        <label>🍝 Wat eet je bij het diner?</label>
+        <label>🍝 Diner hoofdbestanddeel</label>
         <select id="carbSource">
             <option value="pasta">Pasta</option>
-            <option value="rijst">Basmatirijst</option>
+            <option value="basmatirijst">Basmatirijst</option>
             <option value="couscous">Couscous</option>
             <option value="wraps">Wraps</option>
             <option value="aardappels">Aardappels</option>
         </select>
     </div>
 
-    <button onclick="calculatePlan()">Bereken Mijn Dag</button>
+    <button type="button" onclick="berekenPlan()">BEREKEN MIJN DAG</button>
 
-    <div id="output" style="display:none; margin-top:20px;">
+    <div id="resultaatSectie" style="display:none;">
         <div class="total-display">
-            <span style="font-size: 14px; opacity: 0.8;">Totaal Dagdoel</span>
-            <span class="total-kcal" id="totalKcal">0 kcal</span>
+            <span style="font-size:12px; opacity:0.8;">TOTAAL BUDGET</span><br>
+            <span id="totaalKcalDisplay" style="font-size:24px; font-weight:bold;">0 kcal</span>
         </div>
-        <div id="mealContainer"></div>
+        <div id="maaltijdLijst"></div>
     </div>
 </div>
 
 <script>
-function calculatePlan() {
+function berekenPlan() {
+    // 1. Inputs ophalen
     const bmr = 1800;
     const watt = parseFloat(document.getElementById('watt').value) || 0;
     const min = parseFloat(document.getElementById('tijd').value) || 0;
-    const moment = document.getElementById('moment').value;
-    const carbSource = document.getElementById('carbSource').value;
+    const carbKeuze = document.getElementById('carbSource').value;
     
+    // 2. Calorieën berekenen
     const sportKcal = Math.round(watt * (min / 60) * 3.6);
-    const totalKcal = bmr + sportKcal;
+    const totaalKcal = bmr + sportKcal;
 
-    document.getElementById('totalKcal').innerText = totalKcal + " kcal";
-    document.getElementById('output').style.display = 'block';
+    // 3. UI zichtbaar maken
+    document.getElementById('totaalKcalDisplay').innerText = totaalKcal + " kcal";
+    document.getElementById('resultaatSectie').style.display = 'block';
 
-    // Verdeling (Pre/Post fuel logica wordt hier toegepast)
-    let pOntbijt = 0.20, pOSnack = 0.10, pLunch = 0.20, pMSnack = 0.10, pDiner = 0.30, pASnack = 0.10;
+    // 4. Maaltijd verdeling
+    const schema = [
+        { naam: "🍳 Ontbijt", pct: 0.20, type: "haver" },
+        { naam: "🍎 Ochtendsnack", pct: 0.10, type: "brood" },
+        { naam: "🥪 Lunch", pct: 0.22, type: "brood" },
+        { naam: "🍌 Middagsnack", pct: 0.10, type: "brood" },
+        { naam: "🍝 Diner", pct: 0.28, type: "diner" },
+        { naam: "🍫 Avondsnack", pct: 0.10, type: "kwark" }
+    ];
 
-    const mealContainer = document.getElementById('mealContainer
+    const lijst = document.getElementById('maaltijdLijst');
+    lijst.innerHTML = "";
+
+    schema.forEach(m => {
+        let kcal = Math.round(totaalKcal * m.pct);
+        let tekst = "";
+
+        if (m.type === "haver") {
+            let rest = kcal - 370; // min banaan, melk, pindakaas, kokos
+            let gramHaver = Math.max(30, Math.round(rest / 3.7));
+            tekst = `Havermout: <span class="qty">${gramHaver}g</span>. <br>Basis: 250ml melk, 1 banaan, 15g pindakaas, 10g kokosrasp.`;
+        } 
+        else if (m.type === "brood") {
+            let sneden = Math.round(kcal / 95); // 95 kcal per belegde snee
+            tekst = `Aantal boterhammen: <span class="qty">${sneden}</span>`;
+        } 
+        else if (m.type === "diner") {
+            let qty = "";
+            if (carbKeuze === "pasta" || carbKeuze
