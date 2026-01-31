@@ -3,163 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RideFuel Recipe Pro</title>
+    <title>RideFuel - Jouw Voedingsplan</title>
     <style>
-        :root { --primary: #e67e22; --bg: #f4f7f9; --accent: #2ecc71; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 10px; color: #333; font-size: 14px; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
-        h2 { color: var(--primary); text-align: center; margin-bottom: 15px; }
-        .setup-box { background: #fff3e0; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ffe0b2; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
-        input, select { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; background: white; }
-        button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        :root { --primary: #e67e22; --bg: #f0f2f5; --card-bg: #ffffff; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 10px; color: #333; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+        h2 { color: var(--primary); text-align: center; margin-bottom: 20px; font-weight: 800; }
         
-        .meal-item { background: white; border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 12px; }
-        .meal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
-        .meal-title { font-weight: bold; font-size: 16px; color: #444; }
-        .meal-kcal { color: var(--primary); font-weight: bold; }
+        .section { background: #fdfdfd; border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #666; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
         
-        .ingredient-list { background: #f9f9f9; padding: 10px; border-radius: 8px; }
-        .ingredient-line { display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed #ddd; padding-bottom: 2px; }
-        .tag { font-size: 10px; text-transform: uppercase; background: #eee; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
-        .total-banner { background: #34495e; color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:active { transform: scale(0.98); }
+
+        .total-display { text-align: center; padding: 15px; background: #34495e; color: white; border-radius: 15px; margin-bottom: 20px; }
+        .total-kcal { font-size: 28px; font-weight: bold; display: block; }
+
+        .meal { border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .meal-title { font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .recipe { font-size: 14px; line-height: 1.6; color: #444; }
+        .qty { font-weight: bold; color: #d35400; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🚴‍♂️ RideFuel Recipe Pro</h2>
-    
-    <div class="setup-box">
-        <label>🕒 Wanneer ga je fietsen?</label>
+    <h2>🚴‍♂️ RideFuel Pro</h2>
+
+    <div class="section">
+        <label>🕒 Wanneer fiets je?</label>
         <select id="moment">
-            <option value="ochtend">In de ochtend (na ontbijt)</option>
-            <option value="middag">In de middag (na lunch)</option>
-            <option value="avond">In de avond (na diner)</option>
+            <option value="ochtend">Ochtend (na ontbijt)</option>
+            <option value="middag">Middag (na lunch)</option>
+            <option value="avond">Avond (na diner)</option>
         </select>
 
-        <label>⚡ Gepland Vermogen (Watt)</label>
+        <label>⚡ Gemiddeld Wattage</label>
         <input type="number" id="watt" value="200">
 
         <label>⏱️ Duur (minuten)</label>
         <input type="number" id="tijd" value="90">
 
-        <button onclick="calculateEverything()">Bereken Hoeveelheden</button>
+        <label>🍝 Wat eet je bij het diner?</label>
+        <select id="carbSource">
+            <option value="pasta">Pasta</option>
+            <option value="rijst">Basmatirijst</option>
+            <option value="couscous">Couscous</option>
+            <option value="wraps">Wraps</option>
+            <option value="aardappels">Aardappels</option>
+        </select>
     </div>
 
-    <div id="results" style="display:none;">
-        <div class="total-banner">
-            <div style="font-size: 12px; opacity: 0.8;">Totaal Dagbudget</div>
-            <div style="font-size: 24px; font-weight: bold;"><span id="totalDisplay">0</span> kcal</div>
-        </div>
+    <button onclick="calculatePlan()">Bereken Mijn Dag</button>
 
+    <div id="output" style="display:none; margin-top:20px;">
+        <div class="total-display">
+            <span style="font-size: 14px; opacity: 0.8;">Totaal Dagdoel</span>
+            <span class="total-kcal" id="totalKcal">0 kcal</span>
+        </div>
         <div id="mealContainer"></div>
     </div>
 </div>
 
 <script>
-// "Database" met ingrediënten (kcal per 100g of per stuk)
-const data = {
-    havermout: 370,
-    melk: 50,
-    pindakaas: 600,
-    kokosrasp: 650,
-    banaan: 90, // per stuk
-    brood: 250,
-    kaas: 400,
-    kip: 110,
-    rijst: 350,
-    pasta: 350,
-    groenten: 30,
-    kwark: 60,
-    noten: 650
-};
-
-function calculateEverything() {
+function calculatePlan() {
     const bmr = 1800;
     const watt = parseFloat(document.getElementById('watt').value) || 0;
     const min = parseFloat(document.getElementById('tijd').value) || 0;
     const moment = document.getElementById('moment').value;
+    const carbSource = document.getElementById('carbSource').value;
     
     const sportKcal = Math.round(watt * (min / 60) * 3.6);
     const totalKcal = bmr + sportKcal;
-    
-    document.getElementById('totalDisplay').innerText = totalKcal;
-    document.getElementById('results').style.display = 'block';
 
-    const mealConfig = [
-        { name: "🍳 Ontbijt", pct: 0.20, recipe: 'havermout_mix' },
-        { name: "🍎 Ochtendsnack", pct: 0.08, recipe: 'lichte_snack' },
-        { name: "🥪 Lunch", pct: 0.25, recipe: 'brood_maaltijd' },
-        { name: "🍌 Middagsnack", pct: 0.08, recipe: 'lichte_snack' },
-        { name: "🍝 Diner", pct: 0.30, recipe: 'warme_maaltijd' },
-        { name: "🍫 Avondsnack", pct: 0.09, recipe: 'herstel_snack' }
-    ];
+    document.getElementById('totalKcal').innerText = totalKcal + " kcal";
+    document.getElementById('output').style.display = 'block';
 
-    const container = document.getElementById('mealContainer');
-    container.innerHTML = "";
+    // Verdeling (Pre/Post fuel logica wordt hier toegepast)
+    let pOntbijt = 0.20, pOSnack = 0.10, pLunch = 0.20, pMSnack = 0.10, pDiner = 0.30, pASnack = 0.10;
 
-    mealConfig.forEach((m, idx) => {
-        let kcalTarget = Math.round(totalKcal * m.pct);
-        let ingredients = [];
-
-        // Specifieke recept-logica
-        if (m.recipe === 'havermout_mix') {
-            // Jouw specifieke vraag: Haver, kokos, pindakaas, melk, banaan
-            let overig = kcalTarget - data.banaan; // 1 banaan eraf
-            let pk = 15; // 15g pindakaas
-            let kr = 10; // 10g kokos
-            overig -= (pk * (data.pindakaas/100)) + (kr * (data.kokosrasp/100));
-            
-            // De rest verdelen we over melk (70%) en havermout (30%) in kcal
-            let gramHaver = Math.round((overig * 0.6) / (data.havermout/100));
-            let gramMelk = Math.round((overig * 0.4) / (data.melk/100));
-
-            ingredients = [
-                { n: "Havermout", g: gramHaver + "g" },
-                { n: "Halfvolle melk", g: gramMelk + "ml" },
-                { n: "Banaan", g: "1 stuk" },
-                { n: "Pindakaas", g: pk + "g" },
-                { n: "Kokosrasp", g: kr + "g" }
-            ];
-        } else if (m.recipe === 'brood_maaltijd') {
-            let sneden = Math.round((kcalTarget * 0.6) / (data.brood / 100 / 35)); // 35g per snee
-            ingredients = [
-                { n: "Volkoren brood", g: sneden + " sneden" },
-                { n: "Beleg (kaas/kip)", g: "Naar behoefte" },
-                { n: "Appel", g: "1 stuk" }
-            ];
-        } else if (m.recipe === 'warme_maaltijd') {
-            let gramRijst = Math.round((kcalTarget * 0.5) / (data.rijst / 100));
-            ingredients = [
-                { n: "Rijst of Pasta (ongekookt)", g: gramRijst + "g" },
-                { n: "Eiwitbron (kip/tofu)", g: "150g" },
-                { n: "Groenten", g: "250g" }
-            ];
-        } else {
-            ingredients = [{ n: "Focus op", g: kcalTarget + " kcal aan gezonde voeding" }];
-        }
-
-        // HTML bouwen voor maaltijd
-        let ingHTML = ingredients.map(i => `
-            <div class="ingredient-line">
-                <span>${i.n}</span>
-                <strong>${i.g}</strong>
-            </div>
-        `).join('');
-
-        container.innerHTML += `
-            <div class="meal-item">
-                <div class="meal-header">
-                    <span class="meal-title">${m.name}</span>
-                    <span class="meal-kcal">${kcalTarget} kcal</span>
-                </div>
-                <div class="ingredient-list">${ingHTML}</div>
-            </div>
-        `;
-    });
-}
-</script>
-
-</body>
-</html>
+    const mealContainer = document.getElementById('mealContainer
