@@ -3,69 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RideFuel - Calorie Calculator</title>
+    <title>RideFuel Pro</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f2f5; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
-        h2 { color: #e67e22; margin-top: 0; text-align: center; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
-        input:focus { border-color: #e67e22; }
-        button { width: 100%; background: #e67e22; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 10px; cursor: pointer; transition: background 0.3s; }
-        button:active { background: #d35400; transform: scale(0.98); }
-        .result-area { margin-top: 25px; padding: 20px; background: #fff3e0; border-radius: 12px; display: none; border-left: 5px solid #e67e22; }
-        .kcal-val { font-size: 24px; font-weight: bold; color: #d35400; }
-        .suggestion { margin-top: 10px; line-height: 1.5; color: #444; }
-        hr { margin: 30px 0; border: 0; border-top: 1px solid #eee; }
+        :root { --primary: #e67e22; --bg: #f8f9fa; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 15px; color: #333; line-height: 1.4; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); max-width: 500px; margin: auto; }
+        h2 { color: var(--primary); text-align: center; margin-bottom: 20px; }
+        .input-box { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        .summary { background: #fff3e0; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; border: 1px solid #ffe0b2; }
+        .total-kcal { font-size: 24px; font-weight: bold; color: #d35400; }
+
+        .meal-list { margin-top: 20px; }
+        .meal-item { background: white; border-left: 5px solid var(--primary); padding: 12px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .meal-title { font-weight: bold; color: #555; display: flex; justify-content: space-between; }
+        .meal-kcal { color: var(--primary); }
+        .meal-desc { font-size: 13px; color: #777; margin-top: 4px; }
+
+        .on-bike { background: #e3f2fd; border-left: 5px solid #2196f3; padding: 12px; border-radius: 8px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🚴‍♂️ RideFuel Tracker</h2>
+    <h2>🚴‍♂️ RideFuel Pro</h2>
     
-    <div id="setup">
-        <div class="input-group">
-            <label>Gepland Wattage</label>
-            <input type="number" id="watt" placeholder="Bijv. 200">
-        </div>
-        <div class="input-group">
-            <label>Tijd (minuten)</label>
-            <input type="number" id="tijd" placeholder="Bijv. 60">
-        </div>
-        <button onclick="bereken()">Bereken Maaltijd</button>
+    <div class="input-box">
+        <label>Gepland Wattage (Gemiddeld)</label>
+        <input type="number" id="watt" placeholder="Bijv. 200">
     </div>
+    <div class="input-box">
+        <label>Tijd op de fiets (minuten)</label>
+        <input type="number" id="tijd" placeholder="Bijv. 90">
+    </div>
+    <button onclick="updatePlanning()">Genereer Dagplanning</button>
 
-    <div id="resultaat" class="result-area">
-        <div>Je verbruik: <span class="kcal-val" id="kcalDisplay">0</span> kcal</div>
-        <div class="suggestion" id="suggestieText"></div>
-        
-        <hr>
-        <p style="font-size: 12px; color: #888;"><strong>Achteraf hercalculeren?</strong> Pas hierboven de waarden aan naar je Garmin/Strava data en druk opnieuw op de knop.</p>
+    <div id="results" style="display:none;">
+        <div class="summary">
+            <div>Totaal budget vandaag (incl. rust):</div>
+            <div class="total-kcal"><span id="totalDisplay">0</span> kcal</div>
+            <div style="font-size: 12px; color: #666;">(1800 BMR + <span id="sportDisplay">0</span> sport)</div>
+        </div>
+
+        <div class="on-bike" id="onBikeSection">
+            <strong>🍼 Tijdens de rit:</strong><br>
+            <span id="onBikeText"></span>
+        </div>
+
+        <div class="meal-list" id="mealList">
+            </div>
     </div>
 </div>
 
 <script>
-function bereken() {
-    const w = document.getElementById('watt').value;
-    const t = document.getElementById('tijd').value;
+function updatePlanning() {
+    const bmr = 1800;
+    const watt = parseFloat(document.getElementById('watt').value) || 0;
+    const min = parseFloat(document.getElementById('tijd').value) || 0;
     
-    if(w > 0 && t > 0) {
-        const kcal = Math.round(w * (t / 60) * 3.6);
-        document.getElementById('kcalDisplay').innerText = kcal;
-        
-        let msg = "";
-        if(kcal < 400) msg = "🎯 <b>Herstel:</b> Neem een kleine snack zoals een banaan of 150g magere kwark.";
-        else if(kcal < 800) msg = "🎯 <b>Maaltijd:</b> Een kom havermout of twee volkoren boterhammen met beleg.";
-        else msg = "🎯 <b>Grote Maaltijd:</b> Focus op koolhydraten (pasta/rijst) en 20-30g eiwit voor spierherstel.";
-        
-        document.getElementById('suggestieText').innerHTML = msg;
-        document.getElementById('resultaat').style.display = 'block';
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-}
-</script>
+    const sportKcal = Math.round(watt * (min / 60) * 3.6);
+    const totalKcal = bmr + sportKcal;
+    
+    document.getElementById('totalDisplay').innerText = totalKcal;
+    document.getElementById('sportDisplay').innerText = sportKcal;
+    document.getElementById('results').style.display = 'block';
 
-</body>
-</html>
+    // On-bike fueling logica
+    let onBikeMsg = "";
+    if (min < 45) {
+        onBikeMsg = "Alleen water of elektrolyten is voldoende.";
+    } else {
+        const carbs = Math.round((watt > 200 ? 80 : 50) * (min/60));
+        onBikeMsg = `Focus op koolhydraten: mik op ca. <b>${carbs}g koolhydraten</b> in totaal (gels, repen of sportdrank).`;
+    }
+    document.getElementById('onBikeText').innerHTML = onBikeMsg;
+
+    // Maaltijdverdeling (%)
+    const meals = [
+        { name
