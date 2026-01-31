@@ -3,27 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RideFuel Pro</title>
+    <title>RideFuel Pro v2</title>
     <style>
-        :root { --primary: #e67e22; --bg: #f8f9fa; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 15px; color: #333; line-height: 1.4; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); max-width: 500px; margin: auto; }
+        :root { --primary: #e67e22; --secondary: #2980b9; --bg: #f4f7f9; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 15px; color: #333; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
         h2 { color: var(--primary); text-align: center; margin-bottom: 20px; }
         .input-box { margin-bottom: 15px; }
         label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 5px; }
-        input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 16px; background: white; }
         button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
         .summary { background: #fff3e0; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; border: 1px solid #ffe0b2; }
-        .total-kcal { font-size: 24px; font-weight: bold; color: #d35400; }
+        .total-kcal { font-size: 26px; font-weight: bold; color: #d35400; }
 
         .meal-list { margin-top: 20px; }
-        .meal-item { background: white; border-left: 5px solid var(--primary); padding: 12px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .meal-title { font-weight: bold; color: #555; display: flex; justify-content: space-between; }
-        .meal-kcal { color: var(--primary); }
-        .meal-desc { font-size: 13px; color: #777; margin-top: 4px; }
-
-        .on-bike { background: #e3f2fd; border-left: 5px solid #2196f3; padding: 12px; border-radius: 8px; margin-top: 10px; }
+        .meal-item { background: white; border-left: 5px solid #ccc; padding: 15px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .meal-item.pre { border-left-color: #f1c40f; background: #fffdf0; }
+        .meal-item.post { border-left-color: #2ecc71; background: #f0fff4; }
+        .meal-title { font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .meal-kcal { color: var(--primary); font-size: 18px; }
+        .meal-desc { font-size: 14px; color: #555; margin-top: 8px; line-height: 1.4; }
+        .tag { font-size: 10px; text-transform: uppercase; background: #eee; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
     </style>
 </head>
 <body>
@@ -32,82 +33,59 @@
     <h2>🚴‍♂️ RideFuel Pro</h2>
     
     <div class="input-box">
-        <label>Gepland Wattage (Gemiddeld)</label>
+        <label>Wanneer ga je fietsen?</label>
+        <select id="moment">
+            <option value="ochtend">In de ochtend (na ontbijt)</option>
+            <option value="middag">In de middag (na lunch)</option>
+            <option value="avond">In de avond (na diner)</option>
+        </select>
+    </div>
+
+    <div class="input-box">
+        <label>Gepland Wattage</label>
         <input type="number" id="watt" placeholder="Bijv. 200">
     </div>
+
     <div class="input-box">
-        <label>Tijd op de fiets (minuten)</label>
+        <label>Tijd (minuten)</label>
         <input type="number" id="tijd" placeholder="Bijv. 90">
     </div>
-    <button onclick="updatePlanning()">Genereer Dagplanning</button>
+
+    <button onclick="generatePlan()">Update Mijn Dag</button>
 
     <div id="results" style="display:none;">
         <div class="summary">
-            <div>Totaal budget vandaag (incl. rust):</div>
+            <div>Totaal budget voor vandaag:</div>
             <div class="total-kcal"><span id="totalDisplay">0</span> kcal</div>
-            <div style="font-size: 12px; color: #666;">(1800 BMR + <span id="sportDisplay">0</span> sport)</div>
+            <div style="font-size: 12px; color: #666;">Incl. 1800 kcal rustmetabolisme</div>
         </div>
 
-        <div class="on-bike" id="onBikeSection">
-            <strong>🍼 Tijdens de rit:</strong><br>
-            <span id="onBikeText"></span>
-        </div>
-
-        <div class="meal-list" id="mealList">
-            </div>
+        <div class="meal-list" id="mealList"></div>
     </div>
 </div>
 
 <script>
-function updatePlanning() {
+function generatePlan() {
     const bmr = 1800;
     const watt = parseFloat(document.getElementById('watt').value) || 0;
     const min = parseFloat(document.getElementById('tijd').value) || 0;
+    const moment = document.getElementById('moment').value;
     
     const sportKcal = Math.round(watt * (min / 60) * 3.6);
     const totalKcal = bmr + sportKcal;
     
     document.getElementById('totalDisplay').innerText = totalKcal;
-    document.getElementById('sportDisplay').innerText = sportKcal;
     document.getElementById('results').style.display = 'block';
 
-    // On-bike fueling logica
-    let onBikeMsg = "";
-    if (min < 45) {
-        onBikeMsg = "Alleen water of elektrolyten is voldoende.";
-    } else {
-        const carbs = Math.round((watt > 200 ? 80 : 50) * (min/60));
-        onBikeMsg = `Focus op koolhydraten: mik op ca. <b>${carbs}g koolhydraten</b> in totaal (gels, repen of sportdrank).`;
-    }
-    document.getElementById('onBikeText').innerHTML = onBikeMsg;
-
-    // Maaltijdverdeling (%)
     const meals = [
-        { name: "🍳 Ontbijt", pct: 0.20, desc: "Focus op trage koolhydraten (havermout)." },
-        { name: "🍎 Ochtendsnack", pct: 0.08, desc: "Fruit of een kleine eiwitreep." },
-        { name: "🥪 Lunch", pct: 0.25, desc: "Rijk aan vezels en eiwitten." },
-        { name: "🍌 Middagsnack", pct: 0.08, desc: "Ideaal moment voor wat extra energie." },
-        { name: "🍝 Diner", pct: 0.30, desc: "Grootste maaltijd, herstel focus." },
-        { name: "🍫 Avondsnack", pct: 0.09, desc: "Kwark of lichte snack voor de nacht." }
+        { id: 'ontbijt', name: "🍳 Ontbijt", basePct: 0.20, type: 'normal' },
+        { id: 'osnack', name: "🍎 Ochtendsnack", basePct: 0.08, type: 'normal' },
+        { id: 'lunch', name: "🥪 Lunch", basePct: 0.25, type: 'normal' },
+        { id: 'msnack', name: "🍌 Middagsnack", basePct: 0.08, type: 'normal' },
+        { id: 'diner', name: "🍝 Diner", basePct: 0.30, type: 'normal' },
+        { id: 'asnack', name: "🍫 Avondsnack", basePct: 0.09, type: 'normal' }
     ];
 
-    const mealList = document.getElementById('mealList');
-    mealList.innerHTML = "";
-    
-    meals.forEach(m => {
-        const mKcal = Math.round(totalKcal * m.pct);
-        mealList.innerHTML += `
-            <div class="meal-item">
-                <div class="meal-title">
-                    <span>${m.name}</span>
-                    <span class="meal-kcal">${mKcal} kcal</span>
-                </div>
-                <div class="meal-desc">${m.desc}</div>
-            </div>
-        `;
-    });
-}
-</script>
-
-</body>
-</html>
+    // Logica voor maaltijd-types aanpassen op basis van moment
+    if (moment === 'ochtend') {
+        meals[0].type =
